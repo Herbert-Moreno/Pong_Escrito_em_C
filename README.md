@@ -29,5 +29,7 @@ Este é um projeto simples de um **Jogo Pong** desenvolvido em **C** utilizando 
 3. instale a lib do Raylib usando o UCRT64(compilador C windows)
 
 > link tutorial como instalar C pelo Vscode: https://code.visualstudio.com/docs/cpp/config-mingw
+
 > link do msys(compilador): https://www.msys2.org/wiki/MSYS2-installation/
+
 > codigo para baixar raylib pelo UCRT64: ```pacman -S mingw-w64-ucrt-x86_64-raylib```
