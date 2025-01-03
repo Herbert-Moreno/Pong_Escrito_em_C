@@ -1,18 +1,19 @@
 #include "stdio.h"
 #include "raylib.h"
 
-unsigned int ScreenWidth = 960;
-unsigned int ScreenHeight = 540;
+const unsigned int ScreenWidth = 960;
+const unsigned int ScreenHeight = 540;
 
 int width = 15;
 int height = 100;
-float speed = 3.4;
+float speed = 3.45;
 int ballradius = 10;
 int ballspeedy = 4;
 int ballspeedx = 4;
 int rndballdir[2] = {-1, 1};
 int playerscore = 0;
 int enemyscore = 0;
+#define MAX_TRAIL_LENGTH 20
 
 void update(float *pPlayerposx, float *pPlayerposy, float *pEnemyposx, float *pEnemyposy, float *pBallposx, float *pBallposy);
 
@@ -29,6 +30,9 @@ int main(int argc, char *argv[])
     // posição da bola
     float ballposx = ScreenWidth / 2;
     float ballposy = ScreenHeight / 2;
+    Vector2 trail[MAX_TRAIL_LENGTH]; // Array para armazenar as posições antigas da bola
+    int trailIndex = 0; // Índice para armazenar a próxima posição
+    Color trailColor = (Color){255, 255, 255, 128}; // cor do rastro com transparência (Alpha 128)
 
     // função de iniciar tela
     InitWindow(ScreenWidth, ScreenHeight, "Pong Ping - The Game");
@@ -40,6 +44,10 @@ int main(int argc, char *argv[])
     {   
 	// chama a função update e passa os endereços da memoria de cada variável nos parâmetros
         update(&playerposx, &playerposy, &enemyposx, &enemyposy, &ballposx, &ballposy);
+        
+        Vector2 posicaobola = {ballposx, ballposy};
+        trail[trailIndex] = posicaobola;
+        trailIndex = (trailIndex + 1) % MAX_TRAIL_LENGTH;  // Avança no índice e volta ao início quando chega ao limite
 
         // Desenha na tela Funções de Draw
         BeginDrawing();	
@@ -51,12 +59,28 @@ int main(int argc, char *argv[])
             DrawRectangle(enemyposx, enemyposy, width, height, RED);
             // desenha a bola
             DrawCircle(ballposx, ballposy, ballradius, WHITE);
+
+            for (int i = 0; i < MAX_TRAIL_LENGTH; i++)
+            {
+                int trailPos = (trailIndex + i) % MAX_TRAIL_LENGTH;
+                if (trail[trailPos].x != 0 && trail[trailPos].y != 0)
+                {
+                    // O rastro é desenhado com transparência, o primeiro rastro é mais visível
+                    float opacity = (float)(MAX_TRAIL_LENGTH + i) / MAX_TRAIL_LENGTH;
+                    Color colorWithOpacity = (Color){trailColor.r, trailColor.g, trailColor.b, (unsigned char)(opacity * 40)};
+                    DrawCircleV(trail[trailPos], ballradius - 3, colorWithOpacity);
+                }
+            }
+
             // desenha o placar do player
             DrawText(TextFormat("%i", playerscore), ScreenWidth / 4 - 20, 20, 60, RAYWHITE);
             // desenha o placar do inimigo
             DrawText(TextFormat("%i", enemyscore), 3 * ScreenWidth / 4 - 20, 20, 60, RAYWHITE);
             // desenha a linha que corta o meio
             DrawRectangle(ScreenWidth / 2, 10, 2, ScreenHeight - 20, RAYWHITE);
+            // desenha um circulo que define o meio da quadra
+            Vector2 ringpos = {ScreenWidth / 2, ScreenHeight / 2};
+            DrawRing(ringpos, 80, 82, 0, 360, 14, WHITE);
         EndDrawing();
     }
 
@@ -131,14 +155,14 @@ void update(float *pPlayerposx, float *pPlayerposy, float *pEnemyposx, float *pE
     Rectangle paddleenemy = {*pEnemyposx, *pEnemyposy, width, height}; // cria a colisão do inimigo
     if (CheckCollisionCircleRec(vec2ball, ballradius, paddleplayer)) // checa se houve colisão com o player
     {
-        ballspeedx = ballspeedx * 1.2; // aumenta a velocidade da bola 
-        ballspeedy = ballspeedy * 1.2; // aumenta a velocidade da bola 
+        ballspeedx = ballspeedx * 1.25; // aumenta a velocidade da bola 
+        ballspeedy = ballspeedy * 1.25; // aumenta a velocidade da bola 
         ballspeedx *= -1; // inverte a direção do eixo horizontal da bola
     }
     else if (CheckCollisionCircleRec(vec2ball, ballradius, paddleenemy)) // checa se houve colisão com o inimigo
     {
-        ballspeedx = ballspeedx * 1.2;
-        ballspeedy = ballspeedy * 1.2;
+        ballspeedx = ballspeedx * 1.25;
+        ballspeedy = ballspeedy * 1.25;
         ballspeedx *= -1; // inverte a direção do eixo horizontal da bola
     }
 }
