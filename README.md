@@ -1,6 +1,7 @@
 # Pong - Escrito em C
 Este é um projeto simples de um **Jogo Pong** desenvolvido em **C** utilizando a Lib Raylib. O Pong é um dos primeiros jogos eletrônicos criados, e neste projeto, recriei a versão básica do jogo para testar conhecimentos em C.
 
+![](readmeimg2.png)
 
 ## Funcionalidades
 
@@ -12,9 +13,10 @@ Este é um projeto simples de um **Jogo Pong** desenvolvido em **C** utilizando 
 ## Requisitos
 
 - Saber o basico de C (se quiser modificar)
-- Saber como linkar as lib no vscode
 - Sistema operacional com suporte a C (Windows, Linux, macOS).
-- Compilador C ("nesse projeto foi utilizado o compilador gcc").
+- Compilador C ("nesse projeto foi utilizado o compilador do windows mingw com GCC").
+
+![](readmeimg.png)
 
 ## Como rodar
 
@@ -28,5 +30,7 @@ Este é um projeto simples de um **Jogo Pong** desenvolvido em **C** utilizando 
 
 > link tutorial como instalar C pelo Vscode: https://code.visualstudio.com/docs/cpp/config-mingw
 
-[!Important] Se seu computador for windows e não possui um compilador instale o compilador pelo MSYS2
+> [!IMPORTANT]
+> Se seu computador for windows e não possui um compilador instale o compilador pelo MSYS2
+
 > link do MSYS2(compilador): https://www.msys2.org/wiki/MSYS2-installation/

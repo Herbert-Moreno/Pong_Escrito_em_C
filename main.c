@@ -4,7 +4,11 @@
 
 #define ScreenWidth 960
 #define ScreenHeight 540
-#define Quantidade_Maxima_Rastro 20
+#define Quantidade_Maxima_Rastro 10
+
+Vector2 Rastro[Quantidade_Maxima_Rastro]; // Array para armazenar as posições antigas da bola
+int IndexRastro = 0; // Índice para armazenar a próxima posição
+Color RastroColor = (Color){255, 255, 255, 128}; // cor do rastro com transparência (Alpha 128)
 
 int main(int argc, char *argv[])
 {
@@ -139,6 +143,10 @@ void game_update(Paddle *player, Paddle *enemy, Ball *ball){
 }
 
 void draw_game(const Paddle *player, const Paddle *enemy, const Ball *ball) {
+    Vector2 posicaobola = {ball->position.x, ball->position.y};
+    Rastro[IndexRastro] = posicaobola;
+    IndexRastro = (IndexRastro + 1) % Quantidade_Maxima_Rastro;  // Avança no índice e volta ao início quando chega ao limite
+
     // Desenha na tela Funções de Draw
     BeginDrawing();
     // limpa a tela e seta uma cor preta no fundo
@@ -149,6 +157,15 @@ void draw_game(const Paddle *player, const Paddle *enemy, const Ball *ball) {
     DrawRectangle((int)enemy->position.x, (int)enemy->position.y, (int)enemy->size.x, (int)enemy->size.y, enemy->color);
     // desenha a bola
     DrawCircle((int)ball->position.x, (int)ball->position.y, ball->radius, ball->color);
+
+    for (int i = 0; i < Quantidade_Maxima_Rastro; i++) {
+        int RastroPos = (IndexRastro + i) % Quantidade_Maxima_Rastro;
+        if (Rastro[RastroPos].x != 0 && Rastro[RastroPos].y != 0) {
+            float opacity = (float)(Quantidade_Maxima_Rastro + i) / Quantidade_Maxima_Rastro;
+            Color colorWithOpacity = (Color){RastroColor.r, RastroColor.g, RastroColor.b, (unsigned char)(opacity * 40)};
+            DrawCircleV(Rastro[RastroPos], ball->radius - 3, colorWithOpacity);
+        }
+    }
 
     // desenha o placar do player
     DrawText(TextFormat("%i", player->score), ScreenWidth / 4 - 20, 20, 60, RAYWHITE);
@@ -164,22 +181,16 @@ void draw_game(const Paddle *player, const Paddle *enemy, const Ball *ball) {
 
 
 
-/*Vector2 trail[Quantidade_Maxima_Rastro]; // Array para armazenar as posições antigas da bola
-int trailIndex = 0; // Índice para armazenar a próxima posição
-Color trailColor = (Color){255, 255, 255, 128}; // cor do rastro com transparência (Alpha 128)
-Vector2 posicaobola = {ballposx, ballposy};
-    trail[trailIndex] = posicaobola;
-    trailIndex = (trailIndex + 1) % Quantidade_Maxima_Rastro;  // Avança no índice e volta ao início quando chega ao limite
-
+/*
 */
 /*for (int i = 0; i < Quantidade_Maxima_Rastro; i++)
 {
-    int trailPos = (trailIndex + i) % Quantidade_Maxima_Rastro;
-    if (trail[trailPos].x != 0 && trail[trailPos].y != 0)
+    int RastroPos = (IndexRastro + i) % Quantidade_Maxima_Rastro;
+    if (Rastro[RastroPos].x != 0 && Rastro[RastroPos].y != 0)
     {
         // O rastro é desenhado com transparência, o primeiro rastro é mais visível
         float opacity = (float)(Quantidade_Maxima_Rastro + i) / Quantidade_Maxima_Rastro;
-        Color colorWithOpacity = (Color){trailColor.r, trailColor.g, trailColor.b, (unsigned char)(opacity * 40)};
-        DrawCircleV(trail[trailPos], ballradius - 3, colorWithOpacity);
+        Color colorWithOpacity = (Color){RastroColor.r, RastroColor.g, RastroColor.b, (unsigned char)(opacity * 40)};
+        DrawCircleV(Rastro[RastroPos], ballradius - 3, colorWithOpacity);
     }
 }*/
