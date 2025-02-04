@@ -55,6 +55,8 @@ void game_init(Paddle *player, Paddle *enemy, Ball *ball) {
     ball->speed = (Vector2){4, 4};
     ball->rndballdir[0] = -1;
     ball->rndballdir[1] = 1;
+    ball->speed.x *= (float)ball->rndballdir[GetRandomValue(0, 1)]; // escolhe uma direção aleatoria para o eixo x da bola
+    ball->speed.y *= (float)ball->rndballdir[GetRandomValue(0, 1)]; // escolhe uma direção aleatoria para o eixo y da bola
 
     // função de iniciar tela
     InitWindow(ScreenWidth, ScreenHeight, "Pong Ping - The Game");
@@ -64,43 +66,30 @@ void game_init(Paddle *player, Paddle *enemy, Ball *ball) {
 
 // Atualiza variaveis dos objetos na tela
 void game_update(Paddle *player, Paddle *enemy, Ball *ball){
-    // checar colisão da bola com player e inimigo
-    Rectangle BallCollisor = {ball->position.x, ball->position.y, ball->radius, ball->radius}; // cria um array de vetor 2 para as posições da bola
-    Rectangle PlayerCollisor = {player->position.x, player->position.y, player->size.x, player->size.y}; // cria a colisão do player
-    Rectangle EnemyCollisor = {enemy->position.x, enemy->position.y, enemy->size.x, enemy->size.y}; // cria a colisão do inimigo
-    if (CheckCollisionRecs(PlayerCollisor, BallCollisor)) // checa se houve colisão com o player
-    {
-        ball->speed.x += 0.25f; // aumenta a velocidade da bola
-        ball->speed.y += 0.25f; // aumenta a velocidade da bola
-        ball->speed.x *= -1; // inverte a direção do eixo horizontal da bola
-        enemy->speed += 0.1f;
-        player->speed += 0.1f;
-    } else if (CheckCollisionRecs(EnemyCollisor, BallCollisor)) // checa se houve colisão com o inimigo
-    {
-        ball->speed.x += 0.25f;
-        ball->speed.y += 0.25f;
-        ball->speed.x *= -1; // inverte a direção do eixo horizontal da bola
-        enemy->speed += 0.1f;
-        player->speed += 0.1f;
-    }
-
     // atualização do player
-    if (IsKeyDown(KEY_UP) && player->position.y >= 10 || IsKeyDown(KEY_W) && player->position.y >= 10)
+    if (IsKeyDown(KEY_UP) && player->position.y >= 0 ||
+        IsKeyDown(KEY_W) && player->position.y >= 0)
     {
         player->position.y -= player->speed;
     }
-    else if (IsKeyDown(KEY_DOWN) && player->position.y <= (float)ScreenHeight - player->size.y - 10 || IsKeyDown(KEY_S) && player->position.y <= (float)ScreenHeight - player->size.y - 10)
+    else if (IsKeyDown(KEY_DOWN) && player->position.y <= (float)ScreenHeight - player->size.y ||
+        IsKeyDown(KEY_S) && player->position.y <= (float)ScreenHeight - player->size.y)
     {
         player->position.y += player->speed;
     }
+
     //atualizar inimigo
-    if (enemy->position.y + enemy->size.y / 2 >= ball->position.y && enemy->position.y >= 10)
-    {
-        enemy->position.y -= enemy->speed;
-    }
-    else if (enemy->position.y + enemy->size.y / 2 <= ball->position.y && enemy->position.y <= ((float)ScreenHeight - enemy->size.y - 10))
-    {
-        enemy->position.y += enemy->speed;
+    if (ball->position.x >= (float)ScreenWidth/2) {
+        if (enemy->position.y + enemy->size.y / 2 >= ball->position.y &&
+            enemy->position.y >= 0)
+        {
+            enemy->position.y -= enemy->speed;
+        }
+        else if (enemy->position.y + enemy->size.y / 2 <= ball->position.y &&
+            enemy->position.y <= ((float)ScreenHeight - enemy->size.y))
+        {
+            enemy->position.y += enemy->speed;
+        }
     }
     // atualização da bola
     ball->position.x += ball->speed.x;
@@ -136,9 +125,27 @@ void game_update(Paddle *player, Paddle *enemy, Ball *ball){
         ball->position.y = (float)ScreenHeight / 2; // reseta a posição y da bola para o meio da tela
         ball->speed.x *= (float)ball->rndballdir[GetRandomValue(0, 1)]; // escolhe uma direção aleatoria para o eixo x da bola
         ball->speed.y *= (float)ball->rndballdir[GetRandomValue(0, 1)]; // escolhe uma direção aleatoria para o eixo y da bola
+
         enemy->score += 1; // aumenta o placar do player
+
         ball->speed.x = 4; // reseta a velocidade da bola
         ball->speed.y = 4; // reseta a velocidade da bola
+    }
+
+    // checar colisão da bola com player e inimigo
+    Rectangle BallCollisor = {ball->position.x, ball->position.y, ball->radius, ball->radius}; // cria um array de vetor 2 para as posições da bola
+    Rectangle PlayerCollisor = {player->position.x, player->position.y, player->size.x, player->size.y}; // cria a colisão do player
+    Rectangle EnemyCollisor = {enemy->position.x, enemy->position.y, enemy->size.x, enemy->size.y}; // cria a colisão do inimigo
+    if (CheckCollisionRecs(PlayerCollisor, BallCollisor)) // checa se houve colisão com o player
+    {
+        ball->speed.x += 1.2f; // aumenta a velocidade da bola
+        ball->speed.y += 1.2f; // aumenta a velocidade da bola
+        ball->speed.x *= -1; // inverte a direção do eixo horizontal da bola
+    } else if (CheckCollisionRecs(EnemyCollisor, BallCollisor)) // checa se houve colisão com o inimigo
+    {
+        ball->speed.x += 1.2f; // aumenta a velocidade da bola
+        ball->speed.y += 1.2f; // aumenta a velocidade da bola
+        ball->speed.x *= -1; // inverte a direção do eixo horizontal da bola
     }
 }
 
